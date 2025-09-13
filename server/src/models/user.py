@@ -12,7 +12,8 @@ class User(Base):
    default=uuid.uuid4
    )
    username: Mapped[str] = mapped_column(
-      String(30)
+      String(30),
+      unique=True
    )
-   email: Mapped[str] = mapped_column()
+   email: Mapped[str] = mapped_column(unique=True)
    password: Mapped[str] = mapped_column()
