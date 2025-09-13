@@ -1,8 +1,13 @@
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
+
 from services.ai_service import ai_service
+from models.db import Base, engine
+from models import init_db
+
 
 app = FastAPI()
+init_db()
 
 class BasicQuery(BaseModel):
    prompt: str
