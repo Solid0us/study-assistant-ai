@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Response, status, Depends, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import APIRouter, Response, status, Depends
 from pydantic import BaseModel, Field, EmailStr
 from models import User, db, RefreshToken
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
 from services.jwt_service import generate_jwt_token
-from dependencies import get_bearer_token
+from dependencies import get_refresh_token
 import bcrypt
 
 salt = bcrypt.gensalt()
@@ -81,7 +80,7 @@ async def login(body: LoginBody, response: Response):
          return {"message": "Could not find user"}
       
 @auth_router.post("/signout")
-async def signout(token: str = Depends(get_bearer_token)):
+async def signout(token: str = Depends(get_refresh_token)):
    with Session(db.engine) as session:
       statement = update(RefreshToken).where(RefreshToken.refresh_token == token).values(is_revoked=True)
       session.execute(statement)

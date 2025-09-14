@@ -8,13 +8,19 @@ ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 REFRESH_TOKEN_SECRET = os.environ.get("REFRESH_TOKEN_SECRET")
 ALGORITHM = "HS256"
 
+class Payload:
+   user_id: str
+   username: str
+   iat: datetime
+   exp: datetime
+
 def generate_jwt_token(user_id: str, username: str, isRefresh: bool):
    issued_date = datetime.now(timezone.utc)
    if isRefresh:
       exp_date = issued_date + timedelta(days=30)
    else:
       exp_date = issued_date + timedelta(hours=1)
-   payload = {
+   payload: Payload = {
       "user_id": user_id,
       "username": username,
       "iat": issued_date,
@@ -39,3 +45,8 @@ def is_jwt_valid(encoded_jwt: str, isRefresh: bool):
    except jwt.InvalidTokenError:
       print("Invalid token")
    return False
+
+def get_jwt_payload(token: str, isRefresh: bool) -> Payload:
+   if isRefresh:
+      return jwt.decode(token, REFRESH_TOKEN_SECRET, ALGORITHM)
+   return jwt.decode(token, ACCESS_TOKEN_SECRET, ALGORITHM)

@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from models import init_db
-from routers import auth, flashcards
+from routers import auth, flashcards, collections
 
 app = FastAPI()
 init_db()
 
 app.include_router(auth.auth_router)
 app.include_router(flashcards.flashcard_router)
+app.include_router(collections.collections_router)
 
 @app.get("/")
 async def root():
