@@ -1,8 +1,12 @@
 from .db import Base
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+   from . import RefreshToken
 
 class User(Base):
    __tablename__ = "users"
@@ -17,3 +21,9 @@ class User(Base):
    )
    email: Mapped[str] = mapped_column(unique=True)
    password: Mapped[str] = mapped_column()
+
+   refresh_tokens: Mapped[list["RefreshToken"]] = relationship(back_populates="user")
+
+   def __init__(self, **kwargs):
+      kwargs.setdefault("id", uuid.uuid4())
+      super().__init__(**kwargs)

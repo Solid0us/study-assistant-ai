@@ -1,8 +1,11 @@
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Response, status, Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field, EmailStr
-from models import User, db
+from models import User, db, RefreshToken
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, update
+from services.jwt_service import generate_jwt_token
+from dependencies import get_bearer_token
 import bcrypt
 
 salt = bcrypt.gensalt()
@@ -33,11 +36,21 @@ async def register(body: RegisterBody):
       )
       try:
          session.add(new_user)
+         refresh_token = generate_jwt_token(str(new_user.id), new_user.username, True)
+         access_token = generate_jwt_token(str(new_user.id), new_user.username, False)
+         session.add(
+            RefreshToken(
+               refresh_token=refresh_token["token"], 
+               issued_at=refresh_token["payload"]["iat"], 
+               expires_at=refresh_token["payload"]["exp"], 
+               user_id=new_user.id)
+            )
          session.commit()
+
       except Exception as e:
          return {"message": e}
 
-   return {"message": "Registered User"}
+   return {"accessToken": access_token, "refreshToken": refresh_token}
 
 @auth_router.post("/login")
 async def login(body: LoginBody, response: Response):
@@ -50,9 +63,27 @@ async def login(body: LoginBody, response: Response):
             user.password.encode("utf-8")
          )
          if matched:
-            return {"message": "Logged in!"}
+            refresh_token = generate_jwt_token(str(user.id), user.username, True)
+            access_token = generate_jwt_token(str(user.id), user.username, False)
+            session.add(
+               RefreshToken(
+                  refresh_token=refresh_token["token"], 
+                  issued_at=refresh_token["payload"]["iat"], 
+                  expires_at=refresh_token["payload"]["exp"], 
+                  user_id=user.id)
+               )
+            session.commit()
+            return {"accessToken": access_token, "refreshToken": refresh_token}
          response.status_code = status.HTTP_401_UNAUTHORIZED
          return {"message": f"Incorrect username or password."}
       else:
          response.status_code = status.HTTP_400_BAD_REQUEST
          return {"message": "Could not find user"}
+      
+@auth_router.post("/signout")
+async def signout(token: str = Depends(get_bearer_token)):
+   with Session(db.engine) as session:
+      statement = update(RefreshToken).where(RefreshToken.refresh_token == token).values(is_revoked=True)
+      session.execute(statement)
+      session.commit()
+   return {"message": f"Successfully signed out."}
