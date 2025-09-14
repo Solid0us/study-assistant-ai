@@ -10,7 +10,7 @@ async def get_refresh_token(credentials: HTTPAuthorizationCredentials = Depends(
    with Session(db.engine) as session:
       statement = select(RefreshToken).where(RefreshToken.refresh_token == credentials.credentials)
       refresh_token = session.scalars(statement).first()
-      if refresh_token and is_jwt_valid(refresh_token, True):
+      if refresh_token and is_jwt_valid(refresh_token.refresh_token, True):
           return credentials.credentials
       raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

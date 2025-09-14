@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field, EmailStr
 from models import User, db, RefreshToken
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
-from services.jwt_service import generate_jwt_token
+from services.jwt_service import generate_jwt_token, get_jwt_payload
 from dependencies import get_refresh_token
 import bcrypt
 
@@ -86,3 +86,8 @@ async def signout(token: str = Depends(get_refresh_token)):
       session.execute(statement)
       session.commit()
    return {"message": f"Successfully signed out."}
+
+@auth_router.post("/refresh")
+async def refresh_token(token: str = Depends(get_refresh_token)):
+   payload = get_jwt_payload(token, True)
+   return generate_jwt_token(user_id=payload["user_id"], username=payload["username"], isRefresh=False)
