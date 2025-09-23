@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Menu, X, Home, Folder, Layers, Settings } from "lucide-react";
+import { Menu, X, Home, Folder, Settings } from "lucide-react";
 import { Outlet } from "react-router";
 import SidebarItem from "@/features/dashboard/components/SidebarItem";
+import useGetJwt from "@/hooks/useGetJwt";
 
 const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const { payload } = useGetJwt();
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-amber-50 to-rose-50 text-gray-800">
@@ -28,7 +30,9 @@ const DashboardLayout = () => {
             RecallAI
           </h1>
         </div>
-
+        <p className="font-bold ml-4 text-2xl">
+          {payload?.username !== null && payload?.username}
+        </p>
         <nav className="flex-1 px-2 py-4 space-y-2">
           <SidebarItem
             icon={<Home size={20} />}
@@ -41,12 +45,6 @@ const DashboardLayout = () => {
             text="Collections"
             isOpen={isOpen}
             path="/dashboard/collections"
-          />
-          <SidebarItem
-            icon={<Layers size={20} />}
-            text="Flashcards"
-            isOpen={isOpen}
-            path="/dashboard/flashcards"
           />
           <SidebarItem
             icon={<Settings size={20} />}

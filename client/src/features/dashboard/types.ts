@@ -6,3 +6,13 @@ export type SidebarItemProps = {
   isOpen: boolean;
   path: string;
 };
+
+export type CollectionsResponse = {
+  collections: {
+    id: string;
+    name: string;
+    description?: string;
+    user_id: string;
+    created_at: Date;
+  }[];
+};

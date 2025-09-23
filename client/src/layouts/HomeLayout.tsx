@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
+import useGetJwt from "@/hooks/useGetJwt";
 import { Outlet } from "react-router";
 import { useNavigate } from "react-router";
 
 const HomeLayout = () => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useGetJwt();
   return (
     <div className="bg-background min-h-screen text-foreground">
       <nav className="flex justify-between items-center px-8 py-4 shadow-sm bg-card/80 backdrop-blur-md sticky top-0 z-50">
@@ -17,9 +19,11 @@ const HomeLayout = () => {
           </a>
           <Button
             className="bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground rounded-xl shadow"
-            onClick={() => navigate("/auth/login")}
+            onClick={() =>
+              navigate(`${isLoggedIn ? "/dashboard/home" : "/auth/login"}`)
+            }
           >
-            Get Started
+            {isLoggedIn ? "Dashboard" : "Get Started"}
           </Button>
         </div>
       </nav>

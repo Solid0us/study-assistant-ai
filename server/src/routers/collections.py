@@ -35,6 +35,14 @@ async def create_collection(body: CreateCollectionBody, token: str = Depends(get
       session.commit()
    return {"message": "Created Collection"}
 
+@collections_router.get("/")
+async def get_collections(token: str = Depends(get_access_token)):
+   payload = get_jwt_payload(token, False)
+   with Session(db.engine) as session:
+      statement = select(Collection).where(Collection.user_id == payload["user_id"])
+      collections = session.scalars(statement).all()
+      return {"collections": collections}
+
 @collections_router.get("/{collection_id}/flashcards")
 async def get_flashcards_in_collection(collection_id: str, token: str = Depends(get_access_token)):
    payload = get_jwt_payload(token, False)
