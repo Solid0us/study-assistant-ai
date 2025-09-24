@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DashboardHomePage from "./features/dashboard/DashboardHomePage.tsx";
 import DashboardLayout from "./layouts/DashboardLayout.tsx";
 import CollectionsPage from "./features/dashboard/CollectionsPage.tsx";
+import SettingsPage from "./features/dashboard/SettingsPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route path="home" element={<DashboardHomePage />} />
             <Route path="collections" element={<CollectionsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

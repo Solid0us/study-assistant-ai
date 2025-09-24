@@ -16,3 +16,8 @@ export type CollectionsResponse = {
     created_at: Date;
   }[];
 };
+
+export type CreateCollectionBody = {
+  name: string;
+  description: string;
+};

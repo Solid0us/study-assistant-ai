@@ -6,7 +6,7 @@ const DashboardHomePage = () => {
   return (
     <div>
       {data && data.data.collections.length > 0 ? (
-        <h1>hih</h1>
+        <h1>Collections {data.data.collections.length}</h1>
       ) : (
         <h1>you have no collections yet!</h1>
       )}
