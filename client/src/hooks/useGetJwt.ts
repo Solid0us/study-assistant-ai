@@ -9,7 +9,7 @@ export type JwtPayload = {
 };
 
 const isPayloadExpired = (payload: JwtPayload) => {
-  return payload.iat < payload.exp;
+  return payload.iat > payload.exp;
 };
 
 const updateJwts = (
@@ -23,7 +23,7 @@ const updateJwts = (
   if (storedAccessToken) {
     const payload: JwtPayload = jwtDecode(storedAccessToken);
     setPayload(payload);
-    setIsLoggedIn(isPayloadExpired(payload));
+    setIsLoggedIn(!isPayloadExpired(payload));
   } else {
     setPayload(null);
     setIsLoggedIn(false);
@@ -37,9 +37,11 @@ const useGetJwt = () => {
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [payload, setPayload] = useState<JwtPayload | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     updateJwts(setPayload, setAccessToken, setRefreshToken, setIsLoggedIn);
+    setIsLoading(false);
     window.addEventListener("storage", () =>
       updateJwts(setPayload, setAccessToken, setRefreshToken, setIsLoggedIn)
     );
@@ -47,13 +49,14 @@ const useGetJwt = () => {
       window.removeEventListener("storage", () =>
         updateJwts(setPayload, setAccessToken, setRefreshToken, setIsLoggedIn)
       );
-  }, [accessToken, refreshToken]);
+  }, []);
 
   return {
     accessToken,
     refreshToken,
     payload,
     isLoggedIn,
+    isLoading,
   };
 };
 

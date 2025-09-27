@@ -17,14 +17,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import AddNewCollectionForm from "./components/AddNewCollectionForm";
+import { useState } from "react";
 
 const CollectionsPage = () => {
   const { data } = useGetCollections();
+  const [isCollectionFormOpen, setIsCollectionFormOpen] = useState(false);
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-rose-50 p-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-amber-700">Your Collections</h1>
-        <Dialog>
+        <Dialog
+          open={isCollectionFormOpen}
+          onOpenChange={setIsCollectionFormOpen}
+        >
           <DialogTrigger asChild>
             <Button className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
@@ -42,7 +47,9 @@ const CollectionsPage = () => {
               </DialogDescription>
             </DialogHeader>
 
-            <AddNewCollectionForm />
+            <AddNewCollectionForm
+              setIsCollectionFormOpen={setIsCollectionFormOpen}
+            />
           </DialogContent>
         </Dialog>
       </div>

@@ -15,6 +15,10 @@ import { z } from "zod";
 import { useCreateCollection } from "../hooks/useCreateColllection";
 import { useGetCollections } from "../hooks/useGetCollections";
 
+interface AddNewCollectionFormProps {
+  setIsCollectionFormOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 const collectionFormSchema = z.object({
   name: z.string().min(1, {
     error: "Name must not be empty.",
@@ -24,8 +28,18 @@ const collectionFormSchema = z.object({
   }),
 });
 
-const AddNewCollectionForm = () => {
-  const { mutate } = useCreateCollection();
+const AddNewCollectionForm = ({
+  setIsCollectionFormOpen,
+}: AddNewCollectionFormProps) => {
+  const { mutate } = useCreateCollection({
+    onSuccess: () => {
+      refetch();
+      setIsCollectionFormOpen(false);
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
   const { refetch } = useGetCollections();
   const form = useForm<z.infer<typeof collectionFormSchema>>({
     resolver: zodResolver(collectionFormSchema),
@@ -36,7 +50,6 @@ const AddNewCollectionForm = () => {
   });
   const handleSubmit = (values: z.infer<typeof collectionFormSchema>) => {
     mutate(values);
-    refetch();
   };
 
   return (

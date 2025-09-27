@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import http from "../../services/HttpService";
-import { useLogin } from "./hooks/useLogin";
 import { useNavigate } from "react-router";
+import { useAuth } from "@/context/AuthContext";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { mutate } = useLogin();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    mutate(
+    login.mutate(
       {
         username,
         password,

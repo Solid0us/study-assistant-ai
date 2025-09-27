@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { useSignup } from "./hooks/useSignup";
 import http from "../../services/HttpService";
+import { useAuth } from "@/context/AuthContext";
 
 const SignupPage = () => {
   const [email, setEmail] = useState("");
@@ -9,11 +9,11 @@ const SignupPage = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const { mutate } = useSignup();
+  const { signup } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutate(
+    signup.mutate(
       {
         email,
         username,

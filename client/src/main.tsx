@@ -14,6 +14,8 @@ import DashboardHomePage from "./features/dashboard/DashboardHomePage.tsx";
 import DashboardLayout from "./layouts/DashboardLayout.tsx";
 import CollectionsPage from "./features/dashboard/CollectionsPage.tsx";
 import SettingsPage from "./features/dashboard/SettingsPage.tsx";
+import { AuthProvider } from "./context/AuthContext.tsx";
+import ProtectedRoutes from "./components/ProtectedRoutes.tsx";
 
 const queryClient = new QueryClient();
 
@@ -21,20 +23,25 @@ createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <StrictMode>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomeLayout />}>
-            <Route index element={<HomePage />} />
-          </Route>
-          <Route path="/auth" element={<AuthLayout />}>
-            <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<SignupPage />} />
-          </Route>
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route path="home" element={<DashboardHomePage />} />
-            <Route path="collections" element={<CollectionsPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<HomeLayout />}>
+              <Route index element={<HomePage />} />
+            </Route>
+
+            <Route path="/auth" element={<AuthLayout />}>
+              <Route path="login" element={<LoginPage />} />
+              <Route path="register" element={<SignupPage />} />
+            </Route>
+            <Route element={<ProtectedRoutes />}>
+              <Route path="/dashboard" element={<DashboardLayout />}>
+                <Route path="home" element={<DashboardHomePage />} />
+                <Route path="collections" element={<CollectionsPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+              </Route>
+            </Route>
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />
     </StrictMode>

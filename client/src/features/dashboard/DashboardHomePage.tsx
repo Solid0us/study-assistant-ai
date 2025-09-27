@@ -2,7 +2,6 @@ import { useGetCollections } from "./hooks/useGetCollections";
 
 const DashboardHomePage = () => {
   const { data } = useGetCollections();
-  console.log(data?.data.collections);
   return (
     <div>
       {data && data.data.collections.length > 0 ? (

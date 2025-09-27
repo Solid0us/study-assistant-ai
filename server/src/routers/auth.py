@@ -53,7 +53,7 @@ async def register(body: RegisterBody):
 
 @auth_router.post("/login")
 async def login(body: LoginBody, response: Response):
-   user_statement = select(User).where(User.username == body.username)
+   user_statement = select(User).where(User.username.ilike(body.username))
    with Session(db.engine) as session:
       user = session.scalars(user_statement).first()
       if user:
@@ -73,11 +73,8 @@ async def login(body: LoginBody, response: Response):
                )
             session.commit()
             return {"accessToken": access_token, "refreshToken": refresh_token}
-         response.status_code = status.HTTP_401_UNAUTHORIZED
-         return {"message": f"Incorrect username or password."}
-      else:
-         response.status_code = status.HTTP_400_BAD_REQUEST
-         return {"message": "Could not find user"}
+      response.status_code = status.HTTP_401_UNAUTHORIZED
+      return {"message": f"Incorrect username or password."}
       
 @auth_router.post("/signout")
 async def signout(token: str = Depends(get_refresh_token)):
