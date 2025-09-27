@@ -1,3 +1,5 @@
+import type { RefreshResponse } from "@/features/auth/types";
+
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export interface HttpOptions extends RequestInit {
@@ -67,14 +69,33 @@ class HttpService {
           ? this.getRefreshToken()
           : this.getAccessToken();
       if (token) {
-        (config.headers as Record<string, string>)[
-          "Authorization"
-        ] = `Bearer ${token}`;
+        this.setAuthHeader(config, token);
       }
     }
-    const response = await fetch(`${this.baseUrl}${endpoint}`, config);
+
+    var response = await fetch(`${this.baseUrl}${endpoint}`, config);
 
     let responseBody: any = null;
+
+    if (response.status === 401) {
+      const refreshConfigs: RequestInit = {
+        ...rest,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      };
+      this.setAuthHeader(refreshConfigs, this.getRefreshToken() ?? "");
+      const refreshResponse = await fetch(
+        `${this.baseUrl}auth/refresh`,
+        refreshConfigs
+      );
+      const refreshResponseBody =
+        (await refreshResponse.json()) as RefreshResponse;
+      this.setAccessToken(refreshResponseBody.token);
+      this.setAuthHeader(config, refreshResponseBody.token);
+      response = await fetch(`${this.baseUrl}${endpoint}`, config);
+    }
 
     if (response.status !== 204) {
       responseBody = await response.json().catch(() => ({}));
@@ -89,6 +110,12 @@ class HttpService {
     }
 
     return { data: responseBody as T, status: response.status };
+  }
+
+  private setAuthHeader(config: RequestInit, token: string) {
+    (config.headers as Record<string, string>)[
+      "Authorization"
+    ] = `Bearer ${token}`;
   }
 }
 

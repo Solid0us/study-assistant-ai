@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 
 const HomeLayout = () => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
+  const { authState } = useAuth();
   return (
     <div className="bg-background min-h-screen text-foreground">
       <nav className="flex justify-between items-center px-8 py-4 shadow-sm bg-card/80 backdrop-blur-md sticky top-0 z-50">
@@ -20,10 +20,16 @@ const HomeLayout = () => {
           <Button
             className="bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground rounded-xl shadow"
             onClick={() =>
-              navigate(`${isLoggedIn ? "/dashboard/home" : "/auth/login"}`)
+              navigate(
+                `${
+                  authState === "authenticated"
+                    ? "/dashboard/home"
+                    : "/auth/login"
+                }`
+              )
             }
           >
-            {isLoggedIn ? "Dashboard" : "Get Started"}
+            {authState === "authenticated" ? "Dashboard" : "Get Started"}
           </Button>
         </div>
       </nav>

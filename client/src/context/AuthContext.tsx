@@ -15,6 +15,8 @@ import http from "../services/HttpService";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 
+export type AuthState = "loading" | "authenticated" | "unauthenticated";
+
 interface JwtPayload {
   username: string;
   iat: number;
@@ -55,13 +57,12 @@ interface AuthProviderValues {
     unknown
   >;
   logout: () => void;
-  isLoggedIn: boolean;
   payload: JwtPayload | null;
   accessToken: string | null;
   refreshToken: string | null;
-  isLoading: boolean;
   isAccessExpired: boolean;
   isRefreshExpired: boolean;
+  authState: AuthState;
 }
 
 const isPayloadExpired = (payload: JwtPayload) => {
@@ -75,13 +76,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [payload, setPayload] = useState<JwtPayload | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [authState, setAuthState] = useState<AuthState>("loading");
 
   useEffect(() => {
-    updateJwts();
-    window.addEventListener("storage", updateJwts);
-    return () => window.removeEventListener("storage", updateJwts);
+    checkTokens();
+    window.addEventListener("storage", checkTokens);
+    return () => window.removeEventListener("storage", checkTokens);
   }, []);
 
   const isTokenExpired = (token: string | null) => {
@@ -132,27 +132,51 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     window.location.replace("/auth/login");
   };
 
-  const updateJwts = () => {
-    setIsLoading(true);
+  const checkTokens = async () => {
+    setAuthState("loading");
     const storedAccessToken = localStorage.getItem("access_token");
     const storedRefreshToken = localStorage.getItem("refresh_token");
-    if (storedAccessToken) {
-      const accessTokenPayload: JwtPayload = jwtDecode(storedAccessToken);
 
-      setPayload(accessTokenPayload);
-      if (isPayloadExpired(accessTokenPayload)) {
-        refresh.mutate();
+    if (storedAccessToken) {
+      const payload: JwtPayload = jwtDecode(storedAccessToken);
+      if (!isPayloadExpired(payload)) {
+        setPayload(payload);
+        setAccessToken(storedAccessToken);
+        setRefreshToken(storedRefreshToken);
+        setAuthState("authenticated");
+        return;
       }
-      setIsLoggedIn(!isPayloadExpired(accessTokenPayload));
-    } else if (storedRefreshToken) {
-      refresh.mutate();
-    } else {
-      setPayload(null);
-      setIsLoggedIn(false);
+
+      if (storedRefreshToken && !isTokenExpired(storedRefreshToken)) {
+        await attemptRefresh(storedRefreshToken);
+        return;
+      }
+    } else if (storedRefreshToken && !isTokenExpired(storedRefreshToken)) {
+      await attemptRefresh(storedRefreshToken);
+      return;
     }
-    setAccessToken(storedAccessToken);
-    setRefreshToken(storedRefreshToken);
-    setIsLoading(false);
+
+    setPayload(null);
+    setAccessToken(null);
+    setRefreshToken(null);
+    setAuthState("unauthenticated");
+  };
+
+  const attemptRefresh = async (refreshToken: string) => {
+    try {
+      await refresh.mutateAsync();
+      const newAccessToken = localStorage.getItem("access_token");
+      if (newAccessToken) {
+        const newPayload: JwtPayload = jwtDecode(newAccessToken);
+        setPayload(newPayload);
+        setAccessToken(newAccessToken);
+        setRefreshToken(refreshToken);
+        setAuthState("authenticated");
+        return;
+      }
+    } catch (err) {
+      console.error("Refresh failed:", err);
+    }
   };
 
   const values: AuthProviderValues = {
@@ -160,11 +184,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     signup,
     logout,
     refresh,
-    isLoggedIn,
     payload,
     accessToken,
     refreshToken,
-    isLoading,
+    authState,
     isAccessExpired,
     isRefreshExpired,
   };

@@ -2,17 +2,16 @@ import { useAuth } from "../context/AuthContext";
 import { Outlet } from "react-router";
 
 const ProtectedRoutes = () => {
-  const { isLoggedIn, isLoading } = useAuth();
-  if (isLoading) {
-    return <div>Loading...</div>;
+  const { authState } = useAuth();
+  switch (authState) {
+    case "loading":
+      return <div>Loading...</div>;
+    case "authenticated":
+      return <Outlet />;
+    default:
+      window.location.replace("/auth/login");
+      return null;
   }
-
-  if (!isLoggedIn) {
-    window.location.replace("/auth/login");
-    return null;
-  }
-
-  return <Outlet />;
 };
 
 export default ProtectedRoutes;
