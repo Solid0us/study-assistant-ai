@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Menu, X, Home, Folder, Settings } from "lucide-react";
-import { Link, Navigate, Outlet } from "react-router";
+import { Outlet } from "react-router";
 import SidebarItem from "@/features/dashboard/components/SidebarItem";
-import useGetJwt from "@/hooks/useGetJwt";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 
 const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const { payload } = useGetJwt();
+  const { payload } = useAuth();
   const { logout } = useAuth();
 
   return (

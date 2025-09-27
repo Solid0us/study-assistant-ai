@@ -23,3 +23,13 @@ export type TokenResponse = {
     exp: Date;
   };
 };
+
+export type RefreshResponse = {
+  token: string;
+  payload: {
+    user_id: string;
+    username: string;
+    iat: Date;
+    exp: Date;
+  };
+};

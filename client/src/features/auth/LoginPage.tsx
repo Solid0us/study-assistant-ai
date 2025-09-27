@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import http from "../../services/HttpService";
-import { useNavigate } from "react-router";
 import { useAuth } from "@/context/AuthContext";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +19,7 @@ const LoginPage = () => {
         onSuccess: (response) => {
           http.setAccessToken(response.data.accessToken.token);
           http.setRefreshToken(response.data.refreshToken.token);
-          navigate("/dashboard/home");
+          window.location.replace("/dashboard/home");
         },
         onError: (err: any) => {
           alert(err);

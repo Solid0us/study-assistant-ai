@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
-import useGetJwt from "@/hooks/useGetJwt";
+import { useAuth } from "@/context/AuthContext";
 import { Outlet } from "react-router";
 import { useNavigate } from "react-router";
 
 const HomeLayout = () => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useGetJwt();
+  const { isLoggedIn } = useAuth();
   return (
     <div className="bg-background min-h-screen text-foreground">
       <nav className="flex justify-between items-center px-8 py-4 shadow-sm bg-card/80 backdrop-blur-md sticky top-0 z-50">

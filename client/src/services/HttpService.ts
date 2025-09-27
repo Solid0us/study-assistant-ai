@@ -62,7 +62,10 @@ class HttpService {
     };
 
     if (auth) {
-      const token = this.getAccessToken();
+      const token =
+        endpoint == "auth/refresh"
+          ? this.getRefreshToken()
+          : this.getAccessToken();
       if (token) {
         (config.headers as Record<string, string>)[
           "Authorization"
