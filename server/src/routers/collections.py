@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from models import db, Collection, Flashcard
 from datetime import datetime, timezone
+from models.collection import CollectionSchema
+from models.flashcard import FlashcardSchema
 
 collections_router = APIRouter(
    prefix="/collections", 
@@ -26,6 +28,10 @@ class CreateCollectionBody(BaseModel):
 class AddFlashcardsToCollectionBody(BaseModel):
    flashcards: list[FlashcardInBody]
 
+class GetFlashcardsInCollectionResponse(BaseModel):
+   collection: CollectionSchema
+   flashcards: list[FlashcardSchema]
+
 @collections_router.post("/")
 async def create_collection(body: CreateCollectionBody, token: str = Depends(get_access_token)):
    payload = get_jwt_payload(token, False)
@@ -42,9 +48,26 @@ async def get_collections(token: str = Depends(get_access_token)):
       statement = select(Collection).where(Collection.user_id == payload["user_id"])
       collections = session.scalars(statement).all()
       return {"collections": collections}
+   
+@collections_router.get("/{collection_id}")
+async def get_collection_by_id(collection_id: str,  token: str = Depends(get_access_token)):
+   payload = get_jwt_payload(token, False)
+   with Session(db.engine) as session:
+      statement = select(Collection).where(
+            Collection.id == collection_id,
+            Collection.user_id == payload["user_id"]
+      )
+      collection = session.scalars(statement).first()
+      if collection:
+         return {"collection": collection}
+      else:
+         raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Could not find collection in database owned by the user."
+         )
 
 @collections_router.get("/{collection_id}/flashcards")
-async def get_flashcards_in_collection(collection_id: str, token: str = Depends(get_access_token)):
+async def get_flashcards_in_collection(collection_id: str, token: str = Depends(get_access_token)) -> GetFlashcardsInCollectionResponse:
    payload = get_jwt_payload(token, False)
    with Session(db.engine) as session:
       statement = select(Collection).where(
@@ -55,10 +78,10 @@ async def get_flashcards_in_collection(collection_id: str, token: str = Depends(
       if collection:
          statement = select(Flashcard).where(Flashcard.collection_id == collection_id)
          flashcards = session.scalars(statement).all()
-         return {"flashcards": flashcards}
+         return {"collection": collection, "flashcards": flashcards}
       else:
          raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Could not find collection in database owned by the user."
          )
 
@@ -84,7 +107,7 @@ async def add_flashcards_to_collection(collection_id: str, body: AddFlashcardsTo
          session.commit()
       else:
          raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Could not find collection in database."
          )
 

@@ -19,7 +19,7 @@ def generate_jwt_token(user_id: str, username: str, isRefresh: bool):
    if isRefresh:
       exp_date = issued_date + timedelta(days=30)
    else:
-      exp_date = issued_date + timedelta(seconds=5)
+      exp_date = issued_date + timedelta(hours=1)
    payload: Payload = {
       "user_id": user_id,
       "username": username,

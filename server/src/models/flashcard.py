@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from .db import Base
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
@@ -26,3 +27,13 @@ class Flashcard(Base):
    def __init__(self, **kwargs):
       kwargs.setdefault("id", uuid.uuid4())
       super().__init__(**kwargs)
+
+class FlashcardSchema(BaseModel):
+   id: uuid.UUID
+   question: str
+   answer: str
+   collection_id: uuid.UUID
+   created_at: datetime
+
+   class Config:
+      orm_mode = True

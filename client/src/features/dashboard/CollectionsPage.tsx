@@ -18,9 +18,11 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import AddNewCollectionForm from "./components/AddNewCollectionForm";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const CollectionsPage = () => {
   const { data } = useGetCollections();
+  const navigate = useNavigate();
   const [isCollectionFormOpen, setIsCollectionFormOpen] = useState(false);
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-rose-50 p-8">
@@ -59,7 +61,8 @@ const CollectionsPage = () => {
           data.data.collections.map((collection) => (
             <Card
               key={collection.id}
-              className="shadow-md rounded-2xl hover:scale-105 duration-100"
+              className="shadow-md rounded-2xl hover:scale-105 duration-100 hover:cursor-pointer"
+              onClick={() => navigate(`${collection.id}`)}
             >
               <CardHeader>
                 <CardTitle>{collection.name}</CardTitle>
