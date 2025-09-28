@@ -10,5 +10,6 @@ export const useGetCollections = () => {
         method: "GET",
         auth: true,
       }),
+    staleTime: 30 * 1000,
   });
 };

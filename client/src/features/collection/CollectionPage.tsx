@@ -3,14 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Plus } from "lucide-react";
 import useGetCollectionFlashCards from "./hooks/useGetCollectionFlashcards";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import AddFlashcardModal from "./components/AddFlashcardModal";
+import { useState } from "react";
 
-const getCollectionIdFromPath = () => {
+export const getCollectionIdFromPath = () => {
   const paths = window.location.pathname.split("/");
   return paths[paths.length - 1];
 };
 
 const CollectionPage = () => {
   const { data } = useGetCollectionFlashCards(getCollectionIdFromPath());
+  const [isCreateFlashcardModalOpen, setIsCreateFlashcardModalOpen] =
+    useState(false);
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -28,9 +33,20 @@ const CollectionPage = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="default" className="flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Add Flashcard
-          </Button>
+          <Dialog
+            open={isCreateFlashcardModalOpen}
+            onOpenChange={setIsCreateFlashcardModalOpen}
+          >
+            <DialogTrigger asChild>
+              <Button variant="default" className="flex items-center gap-2">
+                <Plus className="w-4 h-4" /> Add Flashcard
+              </Button>
+            </DialogTrigger>
+            <AddFlashcardModal
+              setIsCreateFlashcardModalOpen={setIsCreateFlashcardModalOpen}
+            />
+          </Dialog>
+
           <Button variant="outline">Edit Collection</Button>
           <Button variant="ghost">
             <MoreVertical className="w-5 h-5" />

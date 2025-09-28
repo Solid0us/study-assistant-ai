@@ -13,6 +13,7 @@ const useGetCollectionFlashCards = (collectionId: string) => {
           auth: true,
         }
       ),
+    staleTime: 30 * 1000,
   });
 };
 

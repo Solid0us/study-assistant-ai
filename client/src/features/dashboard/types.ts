@@ -21,3 +21,10 @@ export type CreateCollectionBody = {
   name: string;
   description: string;
 };
+
+export type CreateFlashcardsBody = {
+  flashcards: {
+    question: string;
+    answer: string;
+  }[];
+};
