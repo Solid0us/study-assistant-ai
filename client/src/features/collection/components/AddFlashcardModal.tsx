@@ -1,18 +1,15 @@
-import { Button } from "@/components/ui/button";
 import {
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import AddFlashcardForm from "./AddFlashcardForm";
 import z from "zod";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import AIGenerateFlashcardForm from "./AIGenerateFlashcardForm";
 
 export const flashcardFormSchema = z.object({
   flashcards: z.array(
@@ -32,6 +29,28 @@ export const flashcardFormSchema = z.object({
   ),
 });
 
+export const aiGenerateFlashcardFormSchema = z.object({
+  number: z
+    .number()
+    .min(1, {
+      error: "You must generate at least one flashcard",
+    })
+    .max(25, {
+      error: "Cannot generate more than 25 cards at a time.",
+    }),
+  subject: z
+    .string()
+    .min(1, {
+      error: "Subject must not be empty.",
+    })
+    .max(50, {
+      error: "Subject cannot exceed 50 characters.",
+    }),
+  description: z.string().max(255, {
+    error: "Description cannot exceed 255 characters.",
+  }),
+});
+
 interface AddFlashcardModalProps {
   setIsCreateFlashcardModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -40,20 +59,28 @@ const AddFlashcardModal = ({
   setIsCreateFlashcardModalOpen,
 }: AddFlashcardModalProps) => {
   const [tab, setTab] = useState("create");
-  const [aiConfig, setAiConfig] = useState({
-    subject: "",
-    count: 5,
-    description: "",
-  });
-  const handleGenerateAI = () => {
-    console.log("Generating AI flashcards with:", aiConfig);
-  };
 
-  const form = useForm<z.infer<typeof flashcardFormSchema>>({
+  const addFlashcardForm = useForm<z.infer<typeof flashcardFormSchema>>({
     defaultValues: {
       flashcards: [{ question: "", answer: "" }],
     },
     resolver: zodResolver(flashcardFormSchema),
+  });
+
+  const addFlashcardFieldArray = useFieldArray({
+    control: addFlashcardForm.control,
+    name: "flashcards",
+  });
+
+  const aiGenerateFlashcardForm = useForm<
+    z.infer<typeof aiGenerateFlashcardFormSchema>
+  >({
+    defaultValues: {
+      number: 1,
+      subject: "",
+      description: "",
+    },
+    resolver: zodResolver(aiGenerateFlashcardFormSchema),
   });
   return (
     <DialogContent
@@ -70,40 +97,18 @@ const AddFlashcardModal = ({
         </TabsList>
         <TabsContent value="create" className="space-y-4 flex-col">
           <AddFlashcardForm
-            form={form}
+            form={addFlashcardForm}
+            fieldArray={addFlashcardFieldArray}
             setIsCreateFlashcardModalOpen={setIsCreateFlashcardModalOpen}
           />
         </TabsContent>
 
         <TabsContent value="ai" className="space-y-4 mt-4">
-          <div className="max-h-[65vh] sm:max-h-[60vh]">
-            <Input
-              placeholder="Subject (e.g., Biology)"
-              value={aiConfig.subject}
-              onChange={(e) =>
-                setAiConfig({ ...aiConfig, subject: e.target.value })
-              }
-            />
-            <Input
-              type="number"
-              placeholder="Number of cards"
-              value={aiConfig.count}
-              onChange={(e) =>
-                setAiConfig({
-                  ...aiConfig,
-                  count: Number(e.target.value),
-                })
-              }
-            />
-            <Textarea
-              placeholder="Optional description"
-              value={aiConfig.description}
-              onChange={(e) =>
-                setAiConfig({ ...aiConfig, description: e.target.value })
-              }
-            />
-          </div>
-          <Button onClick={handleGenerateAI}>Generate Flashcards</Button>
+          <AIGenerateFlashcardForm
+            aiGenerateFlashcardForm={aiGenerateFlashcardForm}
+            addFlashcardFieldArray={addFlashcardFieldArray}
+            setTab={setTab}
+          />
         </TabsContent>
       </Tabs>
     </DialogContent>

@@ -14,3 +14,16 @@ export type CollectionFlashcardResponse = {
     created_at: Date;
   }[];
 };
+
+export type AiGenerateFlashcardsBody = {
+  number: number;
+  subject: string;
+  description: string;
+};
+
+export type AiGenerateFlashcardsResponse = {
+  flashcards: {
+    question: string;
+    answer: string;
+  }[];
+};

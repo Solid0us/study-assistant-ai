@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { useFieldArray, type UseFormReturn } from "react-hook-form";
+import {
+  useFieldArray,
+  type UseFieldArrayReturn,
+  type UseFormReturn,
+} from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -33,10 +37,21 @@ interface AddFlashcardFormProps {
       }[];
     }
   >;
+  fieldArray: UseFieldArrayReturn<
+    {
+      flashcards: {
+        question: string;
+        answer: string;
+      }[];
+    },
+    "flashcards",
+    "id"
+  >;
 }
 
 const AddFlashcardForm = ({
   form,
+  fieldArray,
   setIsCreateFlashcardModalOpen,
 }: AddFlashcardFormProps) => {
   const { refetch } = useGetCollectionFlashCards(getCollectionIdFromPath());
@@ -47,11 +62,7 @@ const AddFlashcardForm = ({
       setIsCreateFlashcardModalOpen(false);
     },
   });
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "flashcards",
-  });
-
+  const { fields, append, remove } = fieldArray;
   const handleSubmit = (values: z.infer<typeof flashcardFormSchema>) => {
     mutate(values);
   };
