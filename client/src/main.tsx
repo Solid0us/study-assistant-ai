@@ -17,6 +17,7 @@ import SettingsPage from "./features/dashboard/SettingsPage.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import ProtectedRoutes from "./components/ProtectedRoutes.tsx";
 import CollectionPage from "./features/collection/CollectionPage.tsx";
+import ReviewPage from "./features/study/ReviewPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,10 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="home" element={<DashboardHomePage />} />
                 <Route path="collections" element={<CollectionsPage />} />
                 <Route path="collections/:id" element={<CollectionPage />} />
+                <Route path="collections/:id/study">
+                  <Route path="review" element={<ReviewPage />} />
+                  <Route path="quiz" element={<div>Quiz</div>} />
+                </Route>
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
             </Route>

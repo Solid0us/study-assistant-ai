@@ -1,11 +1,12 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Plus } from "lucide-react";
+import { MoreVertical, Plus, PencilLine, BookOpen } from "lucide-react";
 import useGetCollectionFlashCards from "./hooks/useGetCollectionFlashcards";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import AddFlashcardModal from "./components/AddFlashcardModal";
 import { useState } from "react";
+import StudyMethodCard from "./components/StudyMethodCard";
 
 export const getCollectionIdFromPath = () => {
   const paths = window.location.pathname.split("/");
@@ -54,7 +55,7 @@ const CollectionPage = () => {
         </div>
       </div>
       <Tabs defaultValue="flashcards" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="w-full max-w-md flex flex-row overflow-auto">
           <TabsTrigger value="flashcards">Flashcards</TabsTrigger>
           <TabsTrigger value="study">Study</TabsTrigger>
         </TabsList>
@@ -83,9 +84,20 @@ const CollectionPage = () => {
         <TabsContent value="study" className="mt-6">
           <div className="flex flex-col items-center justify-center py-12 border rounded-lg bg-gray-50">
             <h2 className="text-xl font-semibold mb-4">Ready to Study?</h2>
-            <Button size="lg" className="text-lg px-6 py-4">
-              Start Studying
-            </Button>
+            <div className="flex gap-5 flex-wrap justify-center">
+              <StudyMethodCard
+                title="Review Mode"
+                description="Freely browse and flip through your flashcards"
+                link={`${window.location.pathname}/study/review`}
+                icon={<BookOpen />}
+              />
+              <StudyMethodCard
+                title="Quiz Mode"
+                description="Build confidence with quiz assessments"
+                link={`${window.location.pathname}/study/quiz`}
+                icon={<PencilLine />}
+              />
+            </div>
           </div>
         </TabsContent>
       </Tabs>
