@@ -16,6 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      GOOGLE_API_KEY: "123"
       TESTING: "true"
     steps:
       - uses: actions/checkout@v4
