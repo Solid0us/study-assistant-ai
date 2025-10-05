@@ -1,9 +1,9 @@
 from fastapi import status, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from models import db, RefreshToken
+from src.models import db, RefreshToken
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from services.jwt_service import is_jwt_valid
+from src.services.jwt_service import is_jwt_valid
 
 bearer_scheme = HTTPBearer()
 async def get_refresh_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):

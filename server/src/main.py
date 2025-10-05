@@ -4,8 +4,8 @@ from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import IntegrityError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from models import init_db
-from routers import auth, flashcards, collections
+from src.models import init_db
+from src.routers import auth, flashcards, collections
 from dotenv import load_dotenv
 import os
 

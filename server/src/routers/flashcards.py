@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
-from services.ai_service import ai_service
-from services.jwt_service import get_jwt_payload, is_jwt_valid
+from src.services.ai_service import ai_service
+from src.services.jwt_service import get_jwt_payload, is_jwt_valid
 from pydantic import BaseModel, Field
-from dependencies import get_access_token
+from src.dependencies import get_access_token
 from sqlalchemy.orm import Session
-from models import db, Flashcard, Collection, FlashcardScore
+from src.models import db, Flashcard, Collection, FlashcardScore
 from datetime import datetime, timezone
 
 flashcard_router = APIRouter(

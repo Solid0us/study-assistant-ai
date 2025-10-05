@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Response, status, Depends
 from pydantic import BaseModel, Field, EmailStr
-from models import User, db, RefreshToken
+from src.models import User, db, RefreshToken
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
-from services.jwt_service import generate_jwt_token, get_jwt_payload
-from dependencies import get_refresh_token
+from src.services.jwt_service import generate_jwt_token, get_jwt_payload
+from src.dependencies import get_refresh_token
 import bcrypt
 
 salt = bcrypt.gensalt()

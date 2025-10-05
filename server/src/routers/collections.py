@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from services.ai_service import ai_service
-from services.jwt_service import get_jwt_payload, is_jwt_valid
+from src.services.ai_service import ai_service
+from src.services.jwt_service import get_jwt_payload, is_jwt_valid
 from pydantic import BaseModel, Field
-from dependencies import get_access_token
+from src.dependencies import get_access_token
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from models import db, Collection, Flashcard
+from src.models import db, Collection, Flashcard
 from datetime import datetime, timezone
-from models.collection import CollectionSchema
-from models.flashcard import FlashcardSchema
+from src.models.collection import CollectionSchema
+from src.models.flashcard import FlashcardSchema
 
 collections_router = APIRouter(
    prefix="/collections", 
