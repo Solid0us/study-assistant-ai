@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from datetime import datetime, timezone
 
 if TYPE_CHECKING:
-   from . import Collection
+   from . import Collection, FlashcardScore
 
 class Flashcard(Base):
    __tablename__ = "flashcards"
@@ -23,7 +23,8 @@ class Flashcard(Base):
    created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
 
    collection: Mapped["Collection"] = relationship(back_populates="flashcards")
-
+   flashcard_scores: Mapped[list["FlashcardScore"]] = relationship(back_populates="flashcard")
+   
    def __init__(self, **kwargs):
       kwargs.setdefault("id", uuid.uuid4())
       super().__init__(**kwargs)

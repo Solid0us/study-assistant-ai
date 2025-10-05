@@ -6,7 +6,7 @@ import uuid
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-   from . import RefreshToken, Collection
+   from . import RefreshToken, Collection, FlashcardScore
 
 class User(Base):
    __tablename__ = "users"
@@ -24,6 +24,7 @@ class User(Base):
 
    refresh_tokens: Mapped[list["RefreshToken"]] = relationship(back_populates="user")
    collections: Mapped[list["Collection"]] = relationship(back_populates="user")
+   flashcard_scores: Mapped[list["FlashcardScore"]] = relationship(back_populates="user")
    
    def __init__(self, **kwargs):
       kwargs.setdefault("id", uuid.uuid4())
