@@ -1,5 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from sqlalchemy.exc import IntegrityError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from models import init_db
 from routers import auth, flashcards, collections
 from dotenv import load_dotenv
@@ -10,6 +14,21 @@ CORS_ORIGIN=os.environ.get("CORS_ORIGIN")
 origins = CORS_ORIGIN.split(",")
 
 app = FastAPI()
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+   return JSONResponse(
+      status_code=422,
+      content=jsonable_encoder({"detail": exc.errors(), "body": exc.body})
+   )
+
+@app.exception_handler(IntegrityError)
+async def db_integrity_exception_handler(request: Request, exc: IntegrityError):
+    return JSONResponse(
+        status_code=422,
+        content={"detail": "Database integrity error", "message": str(exc.orig)},
+    )
+
 app.add_middleware(
    CORSMiddleware,
    allow_origins=origins,
