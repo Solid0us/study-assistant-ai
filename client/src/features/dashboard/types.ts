@@ -28,3 +28,7 @@ export type CreateFlashcardsBody = {
     answer: string;
   }[];
 };
+
+export type CreateScoreBody = {
+  confidence_level: number;
+};

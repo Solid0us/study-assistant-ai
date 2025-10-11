@@ -5,15 +5,22 @@ import { motion } from "framer-motion";
 interface FlashcardProps {
   front: string;
   back: string;
+  handleClick?: () => void;
 }
 
-const Flashcard = ({ front, back }: FlashcardProps) => {
+const Flashcard = ({ front, back, handleClick }: FlashcardProps) => {
   const [flipped, setFlipped] = useState(false);
+  const handleFlip = () => {
+    setFlipped(!flipped);
+    if (handleClick) {
+      handleClick();
+    }
+  };
   return (
     <div className="w-full max-w-md cursor-pointer perspective-[1000px]">
       <motion.div
         className="relative w-full h-96"
-        onClick={() => setFlipped(!flipped)}
+        onClick={handleFlip}
         animate={{ rotateY: flipped ? 180 : 0 }}
         transition={{ duration: 0.6, ease: "easeInOut" }}
         style={{ transformStyle: "preserve-3d" }}
