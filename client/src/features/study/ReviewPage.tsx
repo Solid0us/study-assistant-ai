@@ -29,7 +29,7 @@ const ReviewPage = () => {
           {data?.data.flashcards.map((card, index) => (
             <CarouselItem
               key={index}
-              className="basis-full flex justify-center items-center h-[500px]"
+              className="basis-full flex justify-center items-center h-[500px] p-0"
             >
               <Flashcard front={card.question} back={card.answer} />
             </CarouselItem>

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import ConfidenceScoreButtons from "./components/ConfidenceScoreButtons";
 import useCreateScore from "./hooks/useCreateScore";
 import EncouragementMessage from "./components/EncouragementMessage";
+import { Spinner } from "@/components/ui/spinner";
 
 const shuffleCards = (flashcards: FlashcardSchema[]) => {
   const copy = [...flashcards];
@@ -40,7 +41,6 @@ const QuizPage = () => {
       },
     }
   );
-
   const handleFlip = () => {
     setDidFlip(true);
   };
@@ -73,7 +73,7 @@ const QuizPage = () => {
   }, [data?.data.flashcards]);
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-top md:justify-center w-full h-[100dvh] bg-background overflow-hidden">
       <Carousel
         setApi={setEmblaApi}
         className="w-full max-w-2xl h-[70vh]"
@@ -87,7 +87,7 @@ const QuizPage = () => {
           {shuffledCards.map((card, index) => (
             <CarouselItem
               key={index}
-              className="basis-full flex justify-center items-center h-[500px]"
+              className="basis-full flex justify-center items-center h-[500px] p-0"
             >
               <Flashcard
                 front={card.question}
@@ -102,6 +102,7 @@ const QuizPage = () => {
             <>
               <ConfidenceScoreButtons onSelect={handleScoreSelect} />
               {score && <Button onClick={submitScore}>Submit Score</Button>}
+              {isPending && <Spinner />}
             </>
           )}
           {isSubmitted && (
